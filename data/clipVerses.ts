@@ -1,0 +1,22 @@
+export const CLIP_VERSES = [
+  { text: "Be the light.", reference: "Matthew 5:14" },
+  { text: "He restores my soul.", reference: "Psalm 23:3" },
+  { text: "With God, all things are possible.", reference: "Matthew 19:26" },
+  { text: "I am with you always.", reference: "Matthew 28:20" },
+  { text: "The Lord is my shepherd.", reference: "Psalm 23:1" },
+  { text: "Love never fails.", reference: "1 Corinthians 13:8" },
+  { text: "Be still, and know that I am God.", reference: "Psalm 46:10" },
+  { text: "I can do all things through Christ.", reference: "Philippians 4:13" },
+  { text: "Perfect love casts out fear.", reference: "1 John 4:18" },
+  { text: "The joy of the Lord is your strength.", reference: "Nehemiah 8:10" },
+  { text: "Walk by faith, not by sight.", reference: "2 Corinthians 5:7" },
+  { text: "God is love.", reference: "1 John 4:8" },
+  { text: "His mercy is everlasting.", reference: "Psalm 100:5" },
+  { text: "Give thanks to the Lord.", reference: "Psalm 107:1" },
+  { text: "He gives power to the weak.", reference: "Isaiah 40:29" },
+  { text: "It is well with my soul.", reference: "Psalm 62:1" },
+  { text: "Trust in the Lord with all your heart.", reference: "Proverbs 3:5" },
+  { text: "Let there be light.", reference: "Genesis 1:3" },
+  { text: "The truth will set you free.", reference: "John 8:32" },
+  { text: "I have found the one whom my soul loves.", reference: "Song of Solomon 3:4" }
+];
