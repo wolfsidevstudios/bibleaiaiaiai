@@ -1,21 +1,24 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Bookmark, LogOut, ArrowLeft, Clapperboard, ClipboardList } from 'lucide-react';
+import { Bookmark, LogOut, ArrowLeft, Clapperboard, ClipboardList, Trophy } from 'lucide-react';
 import { getBookmarks, getClipBookmarks, getSavedPlans } from '../services/storageService';
 import { fetchVerse } from '../services/bibleService';
-import { BibleApiResponse, Clip, Plan } from '../types';
+import { BibleApiResponse, Clip, Plan, Goal } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { plans as staticPlans } from '../data/plans';
 import { AuthContext } from '../contexts/AuthContext';
+import { OnboardingContext } from '../contexts/OnboardingContext';
 
 const ProfilePage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'verses' | 'clips' | 'plans'>('verses');
+  const [activeTab, setActiveTab] = useState<'verses' | 'clips' | 'plans' | 'goals'>('verses');
   const [bookmarkedVerses, setBookmarkedVerses] = useState<BibleApiResponse[]>([]);
   const [bookmarkedClips, setBookmarkedClips] = useState<Clip[]>([]);
   const [savedPlans, setSavedPlans] = useState<Plan[]>([]);
+  const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
   
   const auth = useContext(AuthContext);
+  const onboarding = useContext(OnboardingContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,17 +30,18 @@ const ProfilePage: React.FC = () => {
         const verses = await Promise.all(versePromises);
         setBookmarkedVerses(verses.filter((v): v is BibleApiResponse => v !== null));
       } else if (activeTab === 'clips') {
-        const clips = getClipBookmarks();
-        setBookmarkedClips(clips);
-      } else {
+        setBookmarkedClips(getClipBookmarks());
+      } else if (activeTab === 'plans') {
         const plans = getSavedPlans();
         const allPlans = [...staticPlans.filter(sp => plans.some(p => p.id === sp.id)), ...plans.filter(p => !staticPlans.some(sp => sp.id === p.id))];
         setSavedPlans(getSavedPlans());
+      } else if (activeTab === 'goals') {
+        setGoals(onboarding?.onboardingData?.goals || []);
       }
       setLoading(false);
     };
     loadData();
-  }, [activeTab]);
+  }, [activeTab, onboarding?.onboardingData?.goals]);
   
   const handleLogout = () => {
     auth?.logout();
@@ -47,9 +51,10 @@ const ProfilePage: React.FC = () => {
   const verseCount = getBookmarks().length;
   const clipCount = getClipBookmarks().length;
   const planCount = getSavedPlans().length;
+  const goalCount = onboarding?.onboardingData?.goals?.length || 0;
 
   return (
-    <div className="bg-black min-h-screen text-white">
+    <div className="bg-black min-h-screen text-white pb-16">
       <header className="p-4 flex justify-between items-center border-b border-gray-800">
         <Link to="/" className="text-gray-400 hover:text-white">
           <ArrowLeft size={24} />
@@ -67,8 +72,8 @@ const ProfilePage: React.FC = () => {
 
           <div className="flex items-center justify-around flex-grow">
             <div className="text-center">
-              <p className="text-2xl font-bold">{verseCount}</p>
-              <p className="text-sm text-gray-400">Verses</p>
+              <p className="text-2xl font-bold">{goalCount}</p>
+              <p className="text-sm text-gray-400">Goals</p>
             </div>
              <div className="text-center">
               <p className="text-2xl font-bold">{clipCount}</p>
@@ -80,17 +85,17 @@ const ProfilePage: React.FC = () => {
             </div>
           </div>
         </div>
-        <p className="font-bold">{auth?.user?.name}</p>
+        <p className="font-bold">{onboarding?.onboardingData?.userName || auth?.user?.name}</p>
         <p className="text-sm text-gray-400">Exploring scripture with the help of Lexi.</p>
       </div>
       
       {/* Tabs */}
       <div className="border-t border-b border-gray-800 flex justify-around">
         <button 
-            onClick={() => setActiveTab('verses')}
-            className={`flex-1 flex items-center justify-center space-x-2 p-4 font-semibold transition-colors ${activeTab === 'verses' ? 'text-yellow-400 border-t-2 border-yellow-400' : 'text-gray-400'}`}>
-          <Bookmark size={18} />
-          <span>SAVED</span>
+            onClick={() => setActiveTab('goals')}
+            className={`flex-1 flex items-center justify-center space-x-2 p-4 font-semibold transition-colors ${activeTab === 'goals' ? 'text-yellow-400 border-t-2 border-yellow-400' : 'text-gray-400'}`}>
+          <Trophy size={18} />
+          <span>GOALS</span>
         </button>
         <button 
             onClick={() => setActiveTab('clips')}
@@ -107,32 +112,34 @@ const ProfilePage: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="p-1 pb-16">
+      <div className="p-1">
         {loading ? (
             <div className="flex justify-center mt-8">
                 <LoadingSpinner />
             </div>
         ) : (
             <>
-                {activeTab === 'verses' && (
-                    bookmarkedVerses.length > 0 ? (
-                      <div className="grid grid-cols-3 gap-1">
-                        {bookmarkedVerses.map(verse => (
-                          <div key={verse.reference} className="relative aspect-square bg-gray-800 p-2 flex flex-col justify-center items-center text-center overflow-hidden">
-                            <p className="text-xs font-serif leading-tight">"{verse.text.trim()}"</p>
-                            <p className="absolute bottom-1 right-1 text-xs font-bold text-yellow-500 bg-black bg-opacity-50 px-1 rounded">{verse.reference.split(' ')[0].substring(0,3)} {verse.reference.split(' ')[1]}</p>
-                          </div>
-                        ))}
-                      </div>
+                {activeTab === 'goals' && (
+                    goals.length > 0 ? (
+                        <div className="space-y-3 p-4">
+                            {goals.map(goal => (
+                                <div key={goal.id} className="w-full flex items-center gap-4 bg-gray-800 p-4 rounded-lg">
+                                    <div className="w-8 h-8 flex-shrink-0 bg-yellow-500/20 rounded-full flex items-center justify-center">
+                                        <Trophy size={18} className="text-yellow-400" />
+                                    </div>
+                                    <p className="font-semibold">{goal.text}</p>
+                                </div>
+                            ))}
+                        </div>
                     ) : (
                         <div className="text-center py-16">
-                            <Bookmark size={48} className="mx-auto text-gray-600 mb-4" />
-                            <h3 className="text-xl font-bold">No Saved Verses</h3>
-                            <p className="text-gray-400">Tap the bookmark icon on a verse to save it here.</p>
+                            <Trophy size={48} className="mx-auto text-gray-600 mb-4" />
+                            <h3 className="text-xl font-bold">No Goals Set</h3>
+                            <p className="text-gray-400">You can set your goals during onboarding.</p>
                         </div>
                     )
                 )}
-                 {activeTab === 'clips' && (
+                {activeTab === 'clips' && (
                     bookmarkedClips.length > 0 ? (
                       <div className="grid grid-cols-3 gap-1">
                         {bookmarkedClips.map(clip => (

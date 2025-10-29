@@ -120,3 +120,18 @@ export interface SupabaseClip {
   user_profile_picture?: string;
   user_name?: string;
 }
+
+export interface Goal {
+  id: string;
+  text: string;
+  isCustom: boolean;
+}
+
+export interface OnboardingData {
+  isComplete: boolean;
+  userName: string;
+  language: string;
+  locationAllowed: boolean;
+  goals: Goal[];
+  topics: string[];
+}

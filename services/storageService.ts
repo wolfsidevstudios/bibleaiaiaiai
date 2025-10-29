@@ -1,4 +1,4 @@
-import { Clip, Plan, UserProfile, StreakData } from '../types';
+import { Clip, Plan, UserProfile, StreakData, OnboardingData } from '../types';
 
 const BOOKMARKS_KEY = 'mybible_bookmarks';
 const CLIPS_BOOKMARKS_KEY = 'mybible_clip_bookmarks';
@@ -8,7 +8,17 @@ const USER_PROFILE_KEY = 'mybible_user_profile';
 const STREAK_KEY = 'mybible_daily_streak';
 const LAST_READ_KEY = 'mybible_last_read';
 const DAILY_PRAYER_KEY = 'mybible_daily_prayer';
+const ONBOARDING_DATA_KEY = 'mybible_onboarding_data';
 
+// Onboarding Data
+export const getOnboardingData = (): OnboardingData | null => {
+  const dataJson = localStorage.getItem(ONBOARDING_DATA_KEY);
+  return dataJson ? JSON.parse(dataJson) : null;
+};
+
+export const saveOnboardingData = (data: OnboardingData): void => {
+  localStorage.setItem(ONBOARDING_DATA_KEY, JSON.stringify(data));
+};
 
 // Daily Prayer
 interface DailyPrayerData {

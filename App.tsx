@@ -11,22 +11,52 @@ import ClipsPage from './pages/ClipsPage';
 import QuizPage from './pages/QuizPage';
 import WelcomePage from './pages/WelcomePage';
 import AuthPage from './pages/AuthPage';
+import OnboardingPage from './pages/OnboardingPage';
 import LiveAiPage from './pages/LiveAiPage';
 import CreatePage from './pages/CreatePage';
 import EditPage from './pages/EditPage';
 import PublishPage from './pages/PublishPage';
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
+import { OnboardingProvider, OnboardingContext } from './contexts/OnboardingContext';
+import LoadingSpinner from './components/LoadingSpinner';
 
-const ProtectedRoutes: React.FC = () => {
+const AppRoutes: React.FC = () => {
   const auth = useContext(AuthContext);
+  const onboarding = useContext(OnboardingContext);
 
-  if (!auth?.user) {
-    return <Navigate to="/welcome" replace />;
+  if (auth?.isLoading) {
+    return (
+      <div className="bg-black h-screen w-screen flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+  
+  // User is logged in but hasn't completed onboarding
+  if (auth?.user && !onboarding?.onboardingData?.isComplete) {
+    return (
+      <Routes>
+        <Route path="/onboarding" element={<OnboardingPage />} />
+        <Route path="*" element={<Navigate to="/onboarding" replace />} />
+      </Routes>
+    );
   }
 
+  // User is not logged in, show public pages
+  if (!auth?.user) {
+    return (
+      <Routes>
+        <Route path="/welcome" element={<WelcomePage />} />
+        <Route path="/auth" element={<AuthPage />} />
+        <Route path="*" element={<Navigate to="/welcome" replace />} />
+      </Routes>
+    );
+  }
+
+  // User is logged in and has completed onboarding, show the main app
   return (
     <div className="bg-black text-gray-100 min-h-screen font-sans flex flex-col">
-      <main className="flex-grow pb-20">
+      <main className="flex-grow pb-16">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/read/:book?/:chapter?" element={<ReadPage />} />
@@ -35,7 +65,11 @@ const ProtectedRoutes: React.FC = () => {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/plan/:planId" element={<PlanPage />} />
           <Route path="/quiz/:quizId" element={<QuizPage />} />
-          {/* Redirect any other protected route to home */}
+          <Route path="/live-ai" element={<LiveAiPage />} />
+          <Route path="/create" element={<CreatePage />} />
+          <Route path="/edit" element={<EditPage />} />
+          <Route path="/publish" element={<PublishPage />} />
+          <Route path="/clips" element={<ClipsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
@@ -44,31 +78,14 @@ const ProtectedRoutes: React.FC = () => {
   );
 };
 
-const AppRoutes: React.FC = () => {
-  const auth = useContext(AuthContext);
-  
-  return (
-    <Routes>
-      <Route path="/welcome" element={auth?.user ? <Navigate to="/" /> : <WelcomePage />} />
-      <Route path="/auth" element={auth?.user ? <Navigate to="/" /> : <AuthPage />} />
-      {/* Fullscreen Routes */}
-      <Route path="/live-ai" element={auth?.user ? <LiveAiPage /> : <Navigate to="/welcome" replace />} />
-      <Route path="/create" element={auth?.user ? <CreatePage /> : <Navigate to="/welcome" replace />} />
-      <Route path="/edit" element={auth?.user ? <EditPage /> : <Navigate to="/welcome" replace />} />
-      <Route path="/publish" element={auth?.user ? <PublishPage /> : <Navigate to="/welcome" replace />} />
-      <Route path="/clips" element={auth?.user ? <ClipsPage /> : <Navigate to="/welcome" replace />} />
-      {/* Routes with Bottom Nav */}
-      <Route path="/*" element={<ProtectedRoutes />} />
-    </Routes>
-  )
-}
-
 const App: React.FC = () => {
   return (
     <AuthProvider>
-      <HashRouter>
-        <AppRoutes />
-      </HashRouter>
+      <OnboardingProvider>
+        <HashRouter>
+          <AppRoutes />
+        </HashRouter>
+      </OnboardingProvider>
     </AuthProvider>
   );
 };
