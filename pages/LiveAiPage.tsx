@@ -67,7 +67,7 @@ function createBlob(data: Float32Array): GenaiBlob {
 const LiveAiPage: React.FC = () => {
     const [isListening, setIsListening] = useState(false);
     const [statusText, setStatusText] = useState('Initializing...');
-    const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
+    const [visualizerStream, setVisualizerStream] = useState<MediaStream | null>(null);
 
     const sessionPromiseRef = useRef<any>(null);
     const inputAudioContextRef = useRef<AudioContext | null>(null);
@@ -77,7 +77,13 @@ const LiveAiPage: React.FC = () => {
     const sourcesRef = useRef<Set<AudioBufferSourceNode>>(new Set());
     const nextStartTimeRef = useRef<number>(0);
     const aiRef = useRef<GoogleGenAI | null>(null);
+    const mediaStreamRef = useRef<MediaStream | null>(null);
+    const isListeningRef = useRef(isListening);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        isListeningRef.current = isListening;
+    }, [isListening]);
 
     const stopSession = useCallback(() => {
         if (sessionPromiseRef.current) {
@@ -85,8 +91,9 @@ const LiveAiPage: React.FC = () => {
             sessionPromiseRef.current = null;
         }
 
-        mediaStream?.getTracks().forEach(track => track.stop());
-        setMediaStream(null);
+        mediaStreamRef.current?.getTracks().forEach(track => track.stop());
+        mediaStreamRef.current = null;
+        setVisualizerStream(null);
 
         if (mediaStreamSourceRef.current && scriptProcessorRef.current) {
             mediaStreamSourceRef.current.disconnect(scriptProcessorRef.current);
@@ -96,16 +103,18 @@ const LiveAiPage: React.FC = () => {
             scriptProcessorRef.current = null;
         }
 
-        inputAudioContextRef.current?.close();
-        outputAudioContextRef.current?.close();
+        inputAudioContextRef.current?.close().catch(console.error);
+        outputAudioContextRef.current?.close().catch(console.error);
+        inputAudioContextRef.current = null;
+        outputAudioContextRef.current = null;
 
         setIsListening(false);
         setStatusText('Session ended. Tap mic to start again.');
-    }, [mediaStream]);
+    }, []);
 
 
     const startSession = useCallback(async () => {
-        if (!mediaStream) {
+        if (!mediaStreamRef.current) {
             console.error("Mic stream not available.");
             setStatusText('Microphone not available.');
             return;
@@ -122,13 +131,13 @@ const LiveAiPage: React.FC = () => {
             callbacks: {
                 onopen: () => {
                     setStatusText('Connection open. Speak now.');
-                    const source = inputAudioContextRef.current!.createMediaStreamSource(mediaStream);
+                    const source = inputAudioContextRef.current!.createMediaStreamSource(mediaStreamRef.current!);
                     mediaStreamSourceRef.current = source;
                     const scriptProcessor = inputAudioContextRef.current!.createScriptProcessor(4096, 1, 1);
                     scriptProcessorRef.current = scriptProcessor;
 
                     scriptProcessor.onaudioprocess = (audioProcessingEvent) => {
-                        if (!isListening) return;
+                        if (!isListeningRef.current) return;
                         const inputData = audioProcessingEvent.inputBuffer.getChannelData(0);
                         const pcmBlob = createBlob(inputData);
                         
@@ -183,13 +192,14 @@ const LiveAiPage: React.FC = () => {
                 responseModalities: [Modality.AUDIO],
             },
         });
-    }, [mediaStream, isListening, stopSession]);
+    }, [stopSession]);
 
     useEffect(() => {
         const getMic = async () => {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                setMediaStream(stream);
+                mediaStreamRef.current = stream;
+                setVisualizerStream(stream);
                 setStatusText('Tap mic to start conversation');
             } catch (err) {
                 console.error("Error accessing microphone:", err);
@@ -204,7 +214,6 @@ const LiveAiPage: React.FC = () => {
     }, [stopSession]);
     
     useEffect(() => {
-        // This effect manages the session based on the isListening state
         if (isListening) {
              if (!sessionPromiseRef.current) {
                 startSession();
@@ -216,12 +225,11 @@ const LiveAiPage: React.FC = () => {
                 setStatusText("Paused. Tap mic to resume.");
              }
         }
-
     }, [isListening, startSession]);
 
 
     const handleToggleListening = () => {
-        if (!mediaStream) return;
+        if (!mediaStreamRef.current) return;
         setIsListening(prev => !prev);
     };
     
@@ -243,7 +251,7 @@ const LiveAiPage: React.FC = () => {
             </header>
 
             <main className="flex flex-col items-center justify-center text-center flex-grow">
-                <VoiceVisualizer stream={mediaStream} isPaused={!isListening} />
+                <VoiceVisualizer stream={visualizerStream} isPaused={!isListening} />
                 <p className="mt-8 text-lg text-gray-300 h-8 transition-opacity duration-300">{statusText}</p>
             </main>
 
@@ -251,7 +259,7 @@ const LiveAiPage: React.FC = () => {
                 <button
                     onClick={handleToggleListening}
                     className="w-20 h-20 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center text-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/20 transition-colors"
-                    disabled={!mediaStream}
+                    disabled={!visualizerStream}
                 >
                     {isListening ? <Pause size={36} className="fill-current" /> : <Mic size={36} />}
                 </button>
