@@ -1,3 +1,5 @@
+
+
 export interface Verse {
   book_id: string;
   book_name: string;
@@ -17,7 +19,8 @@ export interface BibleApiResponse {
 
 export interface ChatMessage {
   role: 'user' | 'model';
-  parts: { text: string }[];
+  parts?: { text: string }[];
+  plan?: Plan;
 }
 
 export interface DailyContent {
@@ -32,7 +35,7 @@ export interface Plan {
   id: string;
   title: string;
   duration: string;
-  image: string;
+  image?: string;
   description: string;
   content: DailyContent[];
 }
@@ -75,4 +78,20 @@ export interface Clip {
     text: string;
     reference: string;
   };
+}
+
+export interface QuizQuestion {
+  question: string;
+  options: string[];
+  correctAnswer: string;
+  reference: string;
+  explanation: string;
+}
+
+export interface Quiz {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  questions: QuizQuestion[];
 }

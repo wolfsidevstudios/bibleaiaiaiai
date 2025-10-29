@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ChevronRight, User, Film } from 'lucide-react';
+import { Search, ChevronRight, User, Film, HelpCircle } from 'lucide-react';
 import { BibleApiResponse } from '../types';
 import { fetchVerse } from '../services/bibleService';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -52,6 +52,23 @@ const ClipsCard: React.FC = () => {
                         <Film size={32} className="mx-auto mb-2"/>
                         <h3 className="text-xl font-bold">Clips</h3>
                         <p className="text-sm">Inspirational verse clips</p>
+                    </div>
+                 </div>
+            </Link>
+        </div>
+    );
+};
+
+const DailyQuizCard: React.FC = () => {
+    return (
+        <div className="mb-8">
+            <Link to="/quiz/genesis-beginnings" className="relative block rounded-lg overflow-hidden h-32 group shadow-lg">
+                 <img src="https://images.pexels.com/photos/372327/pexels-photo-372327.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Ancient scroll and quill" className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                    <div className="text-center text-white">
+                        <HelpCircle size={32} className="mx-auto mb-2"/>
+                        <h3 className="text-xl font-bold">Daily Quiz</h3>
+                        <p className="text-sm">Test your knowledge</p>
                     </div>
                  </div>
             </Link>
@@ -134,6 +151,7 @@ const ExplorePage: React.FC = () => {
       </header>
       <VerseOfTheDay />
       <ClipsCard />
+      <DailyQuizCard />
       <PopularPlans />
       <StudyByTopic />
       <FeaturedPassages />

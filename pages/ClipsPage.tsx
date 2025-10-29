@@ -25,29 +25,34 @@ const ClipsPage: React.FC = () => {
     if (node) observer.current.observe(node);
   }, [loading, hasMore]);
 
+  // Fix: Refactor loadClips to use functional state updates, removing the dependency on `clips.length` and preventing potential infinite loops.
   const loadClips = useCallback(async () => {
+    if (!hasMore) return;
     setLoading(true);
     const data = await fetchPhotos(page);
     if (data && data.photos.length > 0) {
-      const newClips = data.photos.map((photo, index) => {
-        const verseIndex = (clips.length + index) % CLIP_VERSES.length;
-        return {
-          id: `${photo.id}-${verseIndex}`,
-          photo: photo,
-          verse: CLIP_VERSES[verseIndex]
-        };
+      setClips(prevClips => {
+        const newClips = data.photos.map((photo, index) => {
+          const verseIndex = (prevClips.length + index) % CLIP_VERSES.length;
+          return {
+            id: `${photo.id}-${verseIndex}`,
+            photo: photo,
+            verse: CLIP_VERSES[verseIndex]
+          };
+        });
+        return [...prevClips, ...newClips];
       });
-      setClips(prev => [...prev, ...newClips]);
-      setHasMore(data.photos.length > 0);
+      setHasMore(data.next_page !== undefined && data.next_page !== '');
     } else {
       setHasMore(false);
     }
     setLoading(false);
-  }, [page, clips.length]);
+  }, [page, hasMore]);
 
   useEffect(() => {
+    // Fix: useEffect now correctly depends on `loadClips`, which itself only depends on `page` and `hasMore`. This follows hook dependency rules.
     loadClips();
-  }, [page]); // Removed loadClips from dependency array as it causes infinite loop with useCallback
+  }, [loadClips]);
 
   return (
     <div className="relative h-screen bg-black overflow-hidden">

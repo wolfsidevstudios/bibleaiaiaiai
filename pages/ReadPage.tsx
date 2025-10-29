@@ -13,10 +13,12 @@ const ReadPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showBookSelector, setShowBookSelector] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchChapterContent = useCallback(async (book: string, chapter: number) => {
     setLoading(true);
     setError(null);
+    setChapterContent(null);
     const data = await fetchVerse(`${book} ${chapter}`);
     if (data) {
       setChapterContent(data);
@@ -60,23 +62,40 @@ const ReadPage: React.FC = () => {
     setCurrentBook(book);
     setCurrentChapter(1);
     setShowBookSelector(false);
+    setSearchQuery('');
   };
   
+  const filteredBooks = BOOK_NAMES.filter(book =>
+    book.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="flex flex-col h-full">
-      <header className="sticky top-0 bg-black border-b border-gray-800 p-3 flex justify-between items-center z-10">
+      <header className="sticky top-0 bg-black border-b border-gray-800 p-3 flex justify-between items-center z-20">
         <div className="relative">
           <button onClick={() => setShowBookSelector(!showBookSelector)} className="flex items-center space-x-1 text-lg font-bold">
             <span>{currentBook} {currentChapter}</span>
             <ChevronDown size={20} className={`transition-transform ${showBookSelector ? 'rotate-180' : ''}`} />
           </button>
           {showBookSelector && (
-            <div className="absolute top-full left-0 mt-2 bg-gray-900 border border-gray-700 rounded-lg shadow-lg h-64 overflow-y-auto w-60">
-              {BOOK_NAMES.map(book => (
-                <button key={book} onClick={() => selectBook(book)} className="block w-full text-left px-4 py-2 hover:bg-gray-800">
-                  {book}
-                </button>
-              ))}
+            <div className="absolute top-full left-0 mt-2 bg-gray-900 border border-gray-700 rounded-lg shadow-lg flex flex-col h-80 w-64">
+                <div className="p-2 border-b border-gray-700">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search for a book..."
+                    className="w-full bg-gray-800 text-white px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                    autoFocus
+                  />
+                </div>
+                <div className="overflow-y-auto">
+                    {filteredBooks.map(book => (
+                        <button key={book} onClick={() => selectBook(book)} className="block w-full text-left px-4 py-2 hover:bg-gray-800">
+                        {book}
+                        </button>
+                    ))}
+                </div>
             </div>
           )}
         </div>

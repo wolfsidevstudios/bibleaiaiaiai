@@ -4,10 +4,11 @@ import { Send, Sparkles, User } from 'lucide-react';
 import { ChatMessage as ChatMessageType } from '../types';
 import { generateAiResponse } from '../services/geminiService';
 import ChatMessage from '../components/ChatMessage';
+import PlanMessage from '../components/PlanMessage';
 
 const AssistantPage: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessageType[]>([
-    { role: 'model', parts: [{ text: "I am here to help you explore the scriptures. Ask me anything 🙏" }] }
+    { role: 'model', parts: [{ text: "I'm Lexi, your personal AI assistant for exploring the scriptures. Ask me anything 🙏" }] }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -31,7 +32,13 @@ const AssistantPage: React.FC = () => {
 
     const aiResponse = await generateAiResponse(userMessage);
     
-    setMessages([...newMessages, { role: 'model', parts: [{ text: aiResponse }] }]);
+    if (typeof aiResponse === 'string') {
+        setMessages([...newMessages, { role: 'model', parts: [{ text: aiResponse }] }]);
+    } else {
+        // It's a Plan object
+        setMessages([...newMessages, { role: 'model', plan: aiResponse }]);
+    }
+
     setIsLoading(false);
   };
   
@@ -41,7 +48,7 @@ const AssistantPage: React.FC = () => {
   }
 
   const suggestedPrompts = [
-    "Explain the Trinity",
+    "Create a 5-day plan on forgiveness",
     "Verses on faith",
     "Who was David?",
   ];
@@ -57,9 +64,15 @@ const AssistantPage: React.FC = () => {
       </header>
 
       <div className="flex-grow p-4 overflow-y-auto">
-        {messages.map((msg, index) => (
-          <ChatMessage key={index} message={msg} />
-        ))}
+        {messages.map((msg, index) => {
+           if (msg.plan) {
+             return <PlanMessage key={index} plan={msg.plan} />;
+           }
+           if(msg.parts) {
+             return <ChatMessage key={index} message={msg} />;
+           }
+           return null;
+        })}
         {isLoading && (
           <div className="flex items-start gap-3 my-4">
             <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center">

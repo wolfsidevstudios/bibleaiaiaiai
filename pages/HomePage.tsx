@@ -65,7 +65,7 @@ const HomePage: React.FC = () => {
       <header className="flex justify-between items-center">
         <div className="flex items-center space-x-2">
             <BookOpen className="w-6 h-6 text-yellow-400" />
-            <h1 className="text-xl font-bold text-gray-100">MyBible</h1>
+            <h1 className="text-xl font-bold text-gray-100">Lexi Bible</h1>
         </div>
          <Link to="/profile">
             <User className="w-6 h-6 text-gray-400 hover:text-yellow-400" />
