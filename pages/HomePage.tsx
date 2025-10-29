@@ -125,9 +125,9 @@ const HomePage: React.FC = () => {
             </header>
 
             <div className="px-4 pb-4 flex justify-center">
-                <div className="bg-gray-800/50 backdrop-blur-lg border border-white/10 p-1 rounded-full flex items-center text-sm font-semibold max-w-xs mx-auto">
-                    <button onClick={() => setActiveTab('today')} className={`w-1/2 py-1.5 rounded-full transition-colors ${activeTab === 'today' ? 'bg-white text-black' : 'text-gray-300'}`}>Today</button>
-                    <button onClick={() => setActiveTab('clips')} className={`w-1/2 py-1.5 rounded-full transition-colors ${activeTab === 'clips' ? 'bg-white text-black' : 'text-gray-300'}`}>Clips</button>
+                <div className="bg-gray-800/50 backdrop-blur-lg border border-white/10 p-1 rounded-full flex items-center text-base font-semibold w-full max-w-sm mx-auto">
+                    <button onClick={() => setActiveTab('today')} className={`w-1/2 py-2 rounded-full transition-colors ${activeTab === 'today' ? 'bg-white text-black' : 'text-gray-300'}`}>Today</button>
+                    <button onClick={() => setActiveTab('clips')} className={`w-1/2 py-2 rounded-full transition-colors ${activeTab === 'clips' ? 'bg-white text-black' : 'text-gray-300'}`}>Clips</button>
                 </div>
             </div>
         </div>
