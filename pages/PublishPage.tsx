@@ -155,13 +155,22 @@ const PublishPage: React.FC = () => {
             </main>
 
             <footer className="p-4 border-t border-gray-800">
-                <button 
-                    onClick={handlePublish}
-                    disabled={isLoading}
-                    className="w-full bg-yellow-500 text-black font-bold py-3 px-6 rounded-lg disabled:bg-gray-600 flex items-center justify-center gap-2"
-                >
-                    {isLoading ? <LoadingSpinner className="border-black"/> : 'Publish'}
-                </button>
+                <div className="flex items-center gap-4">
+                    <button 
+                        onClick={() => navigate(-1)}
+                        disabled={isLoading}
+                        className="w-full bg-gray-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-600 disabled:opacity-50"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        onClick={handlePublish}
+                        disabled={isLoading}
+                        className="w-full bg-yellow-500 text-black font-bold py-3 px-6 rounded-lg disabled:bg-gray-600 flex items-center justify-center gap-2"
+                    >
+                        {isLoading ? <LoadingSpinner className="border-black"/> : 'Publish'}
+                    </button>
+                </div>
             </footer>
         </div>
     );
