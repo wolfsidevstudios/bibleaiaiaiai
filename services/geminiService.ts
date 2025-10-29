@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type, FunctionDeclaration } from "@google/genai";
-import { ChatMessage, Plan } from '../types';
+import { ChatMessage, Plan, GuidedPrayer } from '../types';
 
 const API_KEY = process.env.API_KEY;
 
@@ -33,6 +33,28 @@ const planSchema = {
   },
   required: ["title", "duration", "description", "content"],
 };
+
+const prayerSchema = {
+  type: Type.OBJECT,
+  properties: {
+    topic: { type: Type.STRING, description: "The central topic or theme of the prayer." },
+    sections: {
+      type: Type.ARRAY,
+      description: "The structured parts of the guided prayer.",
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          title: { type: Type.STRING, description: "The title for this section of the prayer (e.g., 'Opening with Praise', 'A Moment of Reflection', 'Prayer for Guidance')." },
+          text: { type: Type.STRING, description: "The spoken text of the prayer for this section. This is what Lexi says." },
+          reflection: { type: Type.STRING, description: "A short, gentle prompt for the user's silent reflection after the text is read (e.g., 'Now, take a moment to silently add your own words.', 'Consider what guidance you are seeking.')." },
+        },
+        required: ["title", "text"],
+      },
+    },
+  },
+  required: ["topic", "sections"],
+};
+
 
 // Fix: Use a function declaration for creating Bible plans. This allows the model to choose between generating a plan or a text response.
 const createBiblePlanDeclaration: FunctionDeclaration = {
@@ -73,6 +95,31 @@ export const generateAiResponse = async (prompt: string): Promise<string | Plan>
     console.error("Error generating AI response:", error);
     // Fix: Simplify error handling as the robust function calling approach removes the need for a complex fallback request.
     return "I'm sorry, I encountered an error. Please try again.";
+  }
+};
+
+export const generateGuidedPrayer = async (topic: string): Promise<GuidedPrayer | null> => {
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: `Generate a structured, guided Christian prayer about "${topic}". The prayer should be gentle, scripture-based, and lead the user through a meaningful conversation with God. Divide it into several sections, each with a title, the prayer text, and a prompt for silent user reflection.`,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: prayerSchema,
+        systemInstruction: "You are Lexi, a gentle and wise AI spiritual guide. Your purpose is to help users connect with God through guided prayer. Create a prayer that is comforting, profound, and easy to follow. Ensure the reflection prompts are open-ended and encourage personal connection.",
+      },
+    });
+
+    const jsonString = response.text.trim();
+    const prayerData = JSON.parse(jsonString);
+
+    if (prayerData && prayerData.topic && Array.isArray(prayerData.sections)) {
+      return prayerData as GuidedPrayer;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error generating guided prayer:", error);
+    return null;
   }
 };
 

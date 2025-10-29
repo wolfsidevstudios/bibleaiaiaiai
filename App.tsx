@@ -20,6 +20,7 @@ import { AuthProvider, AuthContext } from './contexts/AuthContext';
 import { OnboardingProvider, OnboardingContext } from './contexts/OnboardingContext';
 import LoadingSpinner from './components/LoadingSpinner';
 import DonatePage from './pages/DonatePage';
+import PrayerPage from './pages/PrayerPage';
 
 const AppRoutes: React.FC = () => {
   const auth = useContext(AuthContext);
@@ -72,6 +73,7 @@ const AppRoutes: React.FC = () => {
           <Route path="/publish" element={<PublishPage />} />
           <Route path="/clips" element={<ClipsPage />} />
           <Route path="/donate" element={<DonatePage />} />
+          <Route path="/prayer" element={<PrayerPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

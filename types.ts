@@ -135,3 +135,14 @@ export interface OnboardingData {
   goals: Goal[];
   topics: string[];
 }
+
+export interface PrayerSection {
+  title: string;
+  text: string;
+  reflection?: string;
+}
+
+export interface GuidedPrayer {
+  topic: string;
+  sections: PrayerSection[];
+}

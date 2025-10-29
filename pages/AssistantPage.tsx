@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Send, Sparkles, User, Radio } from 'lucide-react';
+import { Send, Sparkles, User, Radio, HandHeart } from 'lucide-react';
 import { ChatMessage as ChatMessageType } from '../types';
 import { generateAiResponse } from '../services/geminiService';
 import ChatMessage from '../components/ChatMessage';
@@ -91,7 +91,11 @@ const AssistantPage: React.FC = () => {
       </div>
 
       <footer className="p-4 bg-black border-t border-gray-800">
-        <div className="flex flex-wrap gap-2 mb-2">
+        <div className="flex flex-wrap gap-2 mb-3">
+            <Link to="/prayer" className="px-3 py-2 bg-yellow-900/50 text-yellow-300 text-sm rounded-full hover:bg-yellow-900/80 flex items-center gap-2">
+                <HandHeart size={16} />
+                Guided Prayer
+            </Link>
             {suggestedPrompts.map(prompt => (
                 <button key={prompt} onClick={() => handleSend(prompt)} className="px-3 py-1 bg-gray-800 text-sm rounded-full hover:bg-gray-700">
                     {prompt}
