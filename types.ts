@@ -101,3 +101,8 @@ export interface UserProfile {
   email: string;
   picture: string;
 }
+
+export interface StreakData {
+  count: number;
+  lastVisit: string; // ISO date string (e.g., "2023-10-27")
+}

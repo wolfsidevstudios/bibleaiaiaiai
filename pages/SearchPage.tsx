@@ -1,15 +1,38 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ChevronRight, User, Film, HelpCircle } from 'lucide-react';
-import { BibleApiResponse } from '../types';
+import { Search, ChevronRight, User, Film, HelpCircle, Flame } from 'lucide-react';
+import { BibleApiResponse, StreakData } from '../types';
 import { fetchVerse } from '../services/bibleService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { plans } from '../data/plans';
+import { updateStreak } from '../services/storageService';
 
 
 const SectionHeader: React.FC<{ title: string }> = ({ title }) => (
   <h2 className="text-2xl font-bold text-gray-100 mb-4">{title}</h2>
 );
+
+const DailyStreak: React.FC = () => {
+    const [streakData, setStreakData] = useState<StreakData | null>(null);
+
+    useEffect(() => {
+        setStreakData(updateStreak());
+    }, []);
+
+    if (!streakData || streakData.count < 1) return null;
+
+    return (
+        <div className="mb-6 bg-gray-800 p-4 rounded-xl flex items-center space-x-4">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-yellow-400 flex items-center justify-center">
+                <Flame size={28} className="text-white" />
+            </div>
+            <div>
+                <p className="text-2xl font-bold">{streakData.count} Day Streak</p>
+                <p className="text-sm text-gray-400">You're on a roll! Keep it up.</p>
+            </div>
+        </div>
+    );
+};
 
 const VerseOfTheDay: React.FC = () => {
     const [verse, setVerse] = useState<BibleApiResponse | null>(null);
@@ -149,6 +172,7 @@ const ExplorePage: React.FC = () => {
             </Link>
         </div>
       </header>
+      <DailyStreak />
       <VerseOfTheDay />
       <ClipsCard />
       <DailyQuizCard />

@@ -1,10 +1,55 @@
-import { Clip, Plan, UserProfile } from '../types';
+import { Clip, Plan, UserProfile, StreakData } from '../types';
 
 const BOOKMARKS_KEY = 'mybible_bookmarks';
 const CLIPS_BOOKMARKS_KEY = 'mybible_clip_bookmarks';
 const PLANS_KEY = 'mybible_saved_plans';
 const PLAN_PROGRESS_KEY = 'mybible_plan_progress';
 const USER_PROFILE_KEY = 'mybible_user_profile';
+const STREAK_KEY = 'mybible_daily_streak';
+
+
+// Daily Streak
+export const getStreakData = (): StreakData | null => {
+  const streakJson = localStorage.getItem(STREAK_KEY);
+  return streakJson ? JSON.parse(streakJson) : null;
+};
+
+export const saveStreakData = (data: StreakData): void => {
+  localStorage.setItem(STREAK_KEY, JSON.stringify(data));
+};
+
+export const updateStreak = (): StreakData => {
+  const today = new Date();
+  const todayStr = today.toISOString().slice(0, 10);
+
+  const streakData = getStreakData();
+
+  if (!streakData) {
+    const newStreak = { count: 1, lastVisit: todayStr };
+    saveStreakData(newStreak);
+    return newStreak;
+  }
+
+  if (streakData.lastVisit === todayStr) {
+    return streakData; // Already visited today
+  }
+
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const yesterdayStr = yesterday.toISOString().slice(0, 10);
+
+  if (streakData.lastVisit === yesterdayStr) {
+    // Streak continues
+    const newStreak = { count: streakData.count + 1, lastVisit: todayStr };
+    saveStreakData(newStreak);
+    return newStreak;
+  } else {
+    // Streak broken, reset to 1
+    const newStreak = { count: 1, lastVisit: todayStr };
+    saveStreakData(newStreak);
+    return newStreak;
+  }
+};
 
 
 // User Profile

@@ -36,7 +36,7 @@ const AuthPage: React.FC = () => {
         if (googleButtonRef.current) {
             window.google.accounts.id.renderButton(
                 googleButtonRef.current,
-                { theme: "outline", size: "large", type: "standard", text: "continue_with", width: "300" } 
+                { theme: "outline", size: "large", type: "standard", text: "continue_with", shape: "pill" } 
             );
         }
     }, [auth, navigate]);
@@ -57,7 +57,7 @@ const AuthPage: React.FC = () => {
                     To create an account, please sign in with your Google account.
                 </p>
 
-                <div ref={googleButtonRef}></div>
+                <div ref={googleButtonRef} className="flex justify-center"></div>
 
             </main>
 
