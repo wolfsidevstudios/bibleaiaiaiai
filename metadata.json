@@ -2,6 +2,7 @@
   "name": "Lexi Bible AI",
   "description": "A modern Bible study app with your personal AI assistant, Lexi, to help you explore and understand the scriptures. Read chapters, get the verse of the day, and ask questions about any passage.",
   "requestFramePermissions": [
-    "microphone"
+    "microphone",
+    "camera"
   ]
 }

@@ -19,7 +19,7 @@ const DailyStreak: React.FC = () => {
     if (!streakData || streakData.count < 1) return null;
 
     return (
-        <div className="mb-6 bg-gray-800 p-4 rounded-xl flex items-center space-x-4">
+        <div className="mb-6 bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-xl flex items-center space-x-4">
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-yellow-400 flex items-center justify-center">
                 <Flame size={28} className="text-white" />
             </div>
@@ -139,7 +139,7 @@ const HomePage: React.FC = () => {
         <DailyStreak />
 
         {/* Verse of the Day */}
-        <div className="mb-6 bg-gradient-to-br from-yellow-600/20 to-gray-900 border border-yellow-600/30 p-6 rounded-2xl shadow-lg w-full">
+        <div className="mb-6 bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-2xl shadow-lg w-full">
             <h2 className="text-sm font-semibold text-yellow-400 mb-3">VERSE OF THE DAY</h2>
             {loadingVerse ? (
                 <div className="flex justify-center items-center h-24"><LoadingSpinner /></div>
@@ -166,7 +166,7 @@ const HomePage: React.FC = () => {
         </div>
         
         {/* Daily Prayer */}
-        <div className="mb-6 bg-gray-800 p-6 rounded-2xl shadow-lg w-full">
+        <div className="mb-6 bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-2xl shadow-lg w-full">
             <div className="flex items-center gap-3 mb-3">
                 <div className="w-8 h-8 flex items-center justify-center rounded-full bg-blue-500/20">
                     <Droplets size={18} className="text-blue-400"/>
@@ -183,7 +183,7 @@ const HomePage: React.FC = () => {
         </div>
         
         {/* Continue Reading */}
-        <div className="mb-6 bg-gray-800 p-4 rounded-2xl shadow-lg w-full flex items-center justify-between">
+        <div className="mb-6 bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl shadow-lg w-full flex items-center justify-between">
             <div>
                 <h2 className="text-lg font-bold">Continue Reading</h2>
                 <p className="text-yellow-400">{lastRead ? `${lastRead.book} ${lastRead.chapter}` : 'Genesis 1'}</p>
@@ -200,19 +200,19 @@ const HomePage: React.FC = () => {
         <div>
             <h2 className="text-xl font-bold mb-4">Explore More</h2>
             <div className="grid grid-cols-2 gap-4">
-                <Link to="/assistant" className="bg-gray-800 p-4 rounded-xl flex flex-col justify-between items-start hover:bg-gray-700 transition-colors h-28">
+                <Link to="/assistant" className="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-xl flex flex-col justify-between items-start hover:bg-gray-700 transition-colors h-28">
                     <Sparkles className="text-purple-400"/>
                     <span className="font-semibold">Ask Lexi</span>
                 </Link>
-                 <Link to="/plan/finding-peace" className="bg-gray-800 p-4 rounded-xl flex flex-col justify-between items-start hover:bg-gray-700 transition-colors h-28">
+                 <Link to="/plan/finding-peace" className="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-xl flex flex-col justify-between items-start hover:bg-gray-700 transition-colors h-28">
                     <BookMarked className="text-green-400"/>
                     <span className="font-semibold">Reading Plans</span>
                 </Link>
-                 <Link to="/quiz/genesis-beginnings" className="bg-gray-800 p-4 rounded-xl flex flex-col justify-between items-start hover:bg-gray-700 transition-colors h-28">
+                 <Link to="/quiz/genesis-beginnings" className="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-xl flex flex-col justify-between items-start hover:bg-gray-700 transition-colors h-28">
                     <HelpCircle className="text-orange-400"/>
                     <span className="font-semibold">Daily Quiz</span>
                 </Link>
-                <Link to="/clips" className="bg-gray-800 p-4 rounded-xl flex flex-col justify-between items-start hover:bg-gray-700 transition-colors h-28">
+                <Link to="/clips" className="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-xl flex flex-col justify-between items-start hover:bg-gray-700 transition-colors h-28">
                     <BookOpen className="text-red-400"/>
                     <span className="font-semibold">Verse Clips</span>
                 </Link>

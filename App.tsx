@@ -12,6 +12,9 @@ import QuizPage from './pages/QuizPage';
 import WelcomePage from './pages/WelcomePage';
 import AuthPage from './pages/AuthPage';
 import LiveAiPage from './pages/LiveAiPage';
+import CreatePage from './pages/CreatePage';
+import EditPage from './pages/EditPage';
+import PublishPage from './pages/PublishPage';
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
 
 const ProtectedRoutes: React.FC = () => {
@@ -31,7 +34,6 @@ const ProtectedRoutes: React.FC = () => {
           <Route path="/assistant" element={<AssistantPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/plan/:planId" element={<PlanPage />} />
-          <Route path="/clips" element={<ClipsPage />} />
           <Route path="/quiz/:quizId" element={<QuizPage />} />
           {/* Redirect any other protected route to home */}
           <Route path="*" element={<Navigate to="/" replace />} />
@@ -49,7 +51,13 @@ const AppRoutes: React.FC = () => {
     <Routes>
       <Route path="/welcome" element={auth?.user ? <Navigate to="/" /> : <WelcomePage />} />
       <Route path="/auth" element={auth?.user ? <Navigate to="/" /> : <AuthPage />} />
+      {/* Fullscreen Routes */}
       <Route path="/live-ai" element={auth?.user ? <LiveAiPage /> : <Navigate to="/welcome" replace />} />
+      <Route path="/create" element={auth?.user ? <CreatePage /> : <Navigate to="/welcome" replace />} />
+      <Route path="/edit" element={auth?.user ? <EditPage /> : <Navigate to="/welcome" replace />} />
+      <Route path="/publish" element={auth?.user ? <PublishPage /> : <Navigate to="/welcome" replace />} />
+      <Route path="/clips" element={auth?.user ? <ClipsPage /> : <Navigate to="/welcome" replace />} />
+      {/* Routes with Bottom Nav */}
       <Route path="/*" element={<ProtectedRoutes />} />
     </Routes>
   )

@@ -106,3 +106,16 @@ export interface StreakData {
   count: number;
   lastVisit: string; // ISO date string (e.g., "2023-10-27")
 }
+
+export interface SupabaseClip {
+  id: string;
+  created_at: string;
+  user_id: string;
+  image_url: string;
+  title?: string;
+  location?: string;
+  is_ai_generated: boolean;
+  verse_references?: { text: string; reference: string }[];
+  user_profile_picture?: string;
+  user_name?: string;
+}
