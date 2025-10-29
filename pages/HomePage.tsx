@@ -10,6 +10,7 @@ import ClipCard from '../components/ClipCard';
 import DailyBrief from '../components/DailyBrief';
 import { getVersesForTopics } from '../data/topicVerses';
 import DonateModal from '../components/DonateModal';
+import TodayView from '../components/TodayView';
 
 const HomePage: React.FC = () => {
   const auth = useContext(AuthContext);
@@ -18,6 +19,7 @@ const HomePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showBrief, setShowBrief] = useState(false);
   const [showDonateModal, setShowDonateModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<'clips' | 'today'>('clips');
 
   useEffect(() => {
     const today = new Date().toISOString().slice(0, 10);
@@ -78,9 +80,10 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <div className="h-screen w-full bg-black">
+    <div className="bg-black flex flex-col h-full">
         {showDonateModal && <DonateModal onClose={() => setShowDonateModal(false)} />}
-        <header className="absolute top-0 left-0 right-0 z-20 p-4 flex justify-between items-center bg-gradient-to-b from-black/50 to-transparent">
+        
+        <header className="p-4 flex justify-between items-center flex-shrink-0">
             <div>
                 <h1 className="text-2xl font-bold text-gray-100">{getGreeting()},</h1>
                 <p className="text-gray-400">{onboarding?.onboardingData?.userName || 'Friend'}</p>
@@ -101,15 +104,30 @@ const HomePage: React.FC = () => {
             </div>
         </header>
 
-        {loading ? (
-             <div className="h-full w-full flex items-center justify-center">
-                <LoadingSpinner />
+        <div className="px-4 pb-2 flex-shrink-0">
+            <div className="bg-gray-800 p-1 rounded-full flex items-center text-sm font-semibold max-w-xs mx-auto">
+                <button onClick={() => setActiveTab('today')} className={`w-1/2 py-1.5 rounded-full transition-colors ${activeTab === 'today' ? 'bg-white text-black' : 'text-gray-300'}`}>Today</button>
+                <button onClick={() => setActiveTab('clips')} className={`w-1/2 py-1.5 rounded-full transition-colors ${activeTab === 'clips' ? 'bg-white text-black' : 'text-gray-300'}`}>Clips</button>
             </div>
-        ) : (
-             <div className="h-full w-full overflow-y-auto snap-y snap-mandatory scroll-smooth">
-                {clips.map(clip => <ClipCard key={clip.id} clip={clip} />)}
-            </div>
-        )}
+        </div>
+
+        <main className="flex-grow overflow-hidden">
+             {activeTab === 'clips' ? (
+                 loading ? (
+                     <div className="h-full w-full flex items-center justify-center">
+                        <LoadingSpinner />
+                    </div>
+                 ) : (
+                     <div className="h-full w-full overflow-y-auto snap-y snap-mandatory scroll-smooth">
+                        {clips.map(clip => <ClipCard key={clip.id} clip={clip} />)}
+                    </div>
+                 )
+             ) : (
+                 <div className="h-full overflow-y-auto">
+                    <TodayView />
+                </div>
+             )}
+        </main>
     </div>
   );
 };

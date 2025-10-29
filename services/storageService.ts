@@ -21,7 +21,7 @@ export const saveOnboardingData = (data: OnboardingData): void => {
 };
 
 // Daily Prayer
-interface DailyPrayerData {
+export interface DailyPrayerData {
   date: string; // YYYY-MM-DD
   prayer: string;
 }

@@ -75,3 +75,19 @@ export const generateAiResponse = async (prompt: string): Promise<string | Plan>
     return "I'm sorry, I encountered an error. Please try again.";
   }
 };
+
+export const generateDailyPrayer = async (): Promise<string> => {
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: 'Write a short, encouraging, and personal morning prayer for a user of a Bible app. Make it about 2-3 sentences long.',
+       config: {
+          systemInstruction: "You are a thoughtful spiritual guide writing a prayer.",
+      },
+    });
+    return response.text;
+  } catch (error) {
+    console.error("Error generating daily prayer:", error);
+    return "Lord, thank you for this new day. Guide my steps and fill my heart with your peace. Amen."; // Fallback prayer
+  }
+};
