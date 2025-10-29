@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, ChevronDown, User } from 'lucide-react';
 import { BIBLE_BOOKS, BOOK_NAMES } from '../constants';
 import { fetchVerse } from '../services/bibleService';
 import { BibleApiResponse, Verse } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { saveLastRead } from '../services/storageService';
 
 const ReadPage: React.FC = () => {
-  const [currentBook, setCurrentBook] = useState('Genesis');
-  const [currentChapter, setCurrentChapter] = useState(1);
+  const { book, chapter } = useParams<{ book: string; chapter: string }>();
+
+  const [currentBook, setCurrentBook] = useState(book ? decodeURIComponent(book) : 'Genesis');
+  const [currentChapter, setCurrentChapter] = useState(chapter ? parseInt(chapter, 10) : 1);
   const [chapterContent, setChapterContent] = useState<BibleApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,6 +22,7 @@ const ReadPage: React.FC = () => {
     setLoading(true);
     setError(null);
     setChapterContent(null);
+    saveLastRead(book, chapter);
     const data = await fetchVerse(`${book} ${chapter}`);
     if (data) {
       setChapterContent(data);

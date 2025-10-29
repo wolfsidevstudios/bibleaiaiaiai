@@ -1,38 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, ChevronRight, User, Film, HelpCircle, Flame } from 'lucide-react';
-import { BibleApiResponse, StreakData } from '../types';
+import { Link, useNavigate } from 'react-router-dom';
+import { Search, ChevronRight, User, Film, HelpCircle } from 'lucide-react';
+import { BibleApiResponse } from '../types';
 import { fetchVerse } from '../services/bibleService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { plans } from '../data/plans';
-import { updateStreak } from '../services/storageService';
 
 
 const SectionHeader: React.FC<{ title: string }> = ({ title }) => (
   <h2 className="text-2xl font-bold text-gray-100 mb-4">{title}</h2>
 );
-
-const DailyStreak: React.FC = () => {
-    const [streakData, setStreakData] = useState<StreakData | null>(null);
-
-    useEffect(() => {
-        setStreakData(updateStreak());
-    }, []);
-
-    if (!streakData || streakData.count < 1) return null;
-
-    return (
-        <div className="mb-6 bg-gray-800 p-4 rounded-xl flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-yellow-400 flex items-center justify-center">
-                <Flame size={28} className="text-white" />
-            </div>
-            <div>
-                <p className="text-2xl font-bold">{streakData.count} Day Streak</p>
-                <p className="text-sm text-gray-400">You're on a roll! Keep it up.</p>
-            </div>
-        </div>
-    );
-};
 
 const VerseOfTheDay: React.FC = () => {
     const [verse, setVerse] = useState<BibleApiResponse | null>(null);
@@ -134,6 +111,18 @@ const StudyByTopic: React.FC = () => {
 };
 
 const FeaturedPassages: React.FC = () => {
+    const navigate = useNavigate();
+
+    const handlePassageClick = (ref: string) => {
+        // Regex to capture book name (including multi-word ones) and the first chapter number
+        const match = ref.match(/(.+)\s+(\d+)/);
+        if (match) {
+            const book = match[1].trim();
+            const chapter = match[2];
+            navigate(`/read/${encodeURIComponent(book)}/${chapter}`);
+        }
+    };
+
     const passages = [
         { title: 'The Sermon on the Mount', ref: 'Matthew 5-7' },
         { title: 'The Good Shepherd', ref: 'Psalm 23' },
@@ -144,8 +133,12 @@ const FeaturedPassages: React.FC = () => {
             <SectionHeader title="Featured Passages" />
             <div className="space-y-3">
                 {passages.map(passage => (
-                    <button key={passage.title} className="w-full flex justify-between items-center bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors">
-                        <div className="text-left">
+                    <button 
+                        key={passage.title} 
+                        onClick={() => handlePassageClick(passage.ref)}
+                        className="w-full flex justify-between items-center bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors text-left"
+                    >
+                        <div>
                             <h4 className="font-semibold">{passage.title}</h4>
                             <p className="text-sm text-gray-400">{passage.ref}</p>
                         </div>
@@ -172,7 +165,6 @@ const ExplorePage: React.FC = () => {
             </Link>
         </div>
       </header>
-      <DailyStreak />
       <VerseOfTheDay />
       <ClipsCard />
       <DailyQuizCard />

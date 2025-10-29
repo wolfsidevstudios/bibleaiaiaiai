@@ -6,6 +6,42 @@ const PLANS_KEY = 'mybible_saved_plans';
 const PLAN_PROGRESS_KEY = 'mybible_plan_progress';
 const USER_PROFILE_KEY = 'mybible_user_profile';
 const STREAK_KEY = 'mybible_daily_streak';
+const LAST_READ_KEY = 'mybible_last_read';
+const DAILY_PRAYER_KEY = 'mybible_daily_prayer';
+
+
+// Daily Prayer
+interface DailyPrayerData {
+  date: string; // YYYY-MM-DD
+  prayer: string;
+}
+
+export const getDailyPrayer = (): DailyPrayerData | null => {
+  const prayerJson = localStorage.getItem(DAILY_PRAYER_KEY);
+  return prayerJson ? JSON.parse(prayerJson) : null;
+};
+
+export const saveDailyPrayer = (prayer: string, date: string): void => {
+  const data: DailyPrayerData = { prayer, date };
+  localStorage.setItem(DAILY_PRAYER_KEY, JSON.stringify(data));
+};
+
+
+// Last Read Chapter
+interface LastReadData {
+  book: string;
+  chapter: number;
+}
+
+export const getLastRead = (): LastReadData | null => {
+  const lastReadJson = localStorage.getItem(LAST_READ_KEY);
+  return lastReadJson ? JSON.parse(lastReadJson) : null;
+};
+
+export const saveLastRead = (book: string, chapter: number): void => {
+  const data: LastReadData = { book, chapter };
+  localStorage.setItem(LAST_READ_KEY, JSON.stringify(data));
+};
 
 
 // Daily Streak

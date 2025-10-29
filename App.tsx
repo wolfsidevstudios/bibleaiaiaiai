@@ -25,7 +25,7 @@ const ProtectedRoutes: React.FC = () => {
       <main className="flex-grow pb-20">
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/read" element={<ReadPage />} />
+          <Route path="/read/:book?/:chapter?" element={<ReadPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/assistant" element={<AssistantPage />} />
           <Route path="/profile" element={<ProfilePage />} />
