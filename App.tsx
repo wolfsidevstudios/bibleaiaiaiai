@@ -19,6 +19,7 @@ import PublishPage from './pages/PublishPage';
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
 import { OnboardingProvider, OnboardingContext } from './contexts/OnboardingContext';
 import LoadingSpinner from './components/LoadingSpinner';
+import DonatePage from './pages/DonatePage';
 
 const AppRoutes: React.FC = () => {
   const auth = useContext(AuthContext);
@@ -70,6 +71,7 @@ const AppRoutes: React.FC = () => {
           <Route path="/edit" element={<EditPage />} />
           <Route path="/publish" element={<PublishPage />} />
           <Route path="/clips" element={<ClipsPage />} />
+          <Route path="/donate" element={<DonatePage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

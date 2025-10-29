@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useContext, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { User, Heart } from 'lucide-react';
 import { PexelsPhoto, Clip } from '../types';
 import { fetchPhotos } from '../services/pexelsService';
@@ -9,16 +9,15 @@ import { OnboardingContext } from '../contexts/OnboardingContext';
 import ClipCard from '../components/ClipCard';
 import DailyBrief from '../components/DailyBrief';
 import { getVersesForTopics } from '../data/topicVerses';
-import DonateModal from '../components/DonateModal';
 import TodayView from '../components/TodayView';
 
 const HomePage: React.FC = () => {
   const auth = useContext(AuthContext);
   const onboarding = useContext(OnboardingContext);
+  const navigate = useNavigate();
   const [clips, setClips] = useState<Clip[]>([]);
   const [loading, setLoading] = useState(true);
   const [showBrief, setShowBrief] = useState(false);
-  const [showDonateModal, setShowDonateModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'clips' | 'today'>('clips');
 
   useEffect(() => {
@@ -81,8 +80,6 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="bg-black h-screen w-screen relative">
-        {showDonateModal && <DonateModal onClose={() => setShowDonateModal(false)} />}
-
         <main className="h-full w-full">
              {activeTab === 'clips' ? (
                  loading ? (
@@ -109,7 +106,7 @@ const HomePage: React.FC = () => {
                     <p className="text-gray-400">{onboarding?.onboardingData?.userName || 'Friend'}</p>
                 </div>
                 <div className="flex items-center space-x-4">
-                    <button onClick={() => setShowDonateModal(true)} className="text-white hover:text-red-400 transition-colors">
+                    <button onClick={() => navigate('/donate')} className="text-white hover:text-red-400 transition-colors">
                         <Heart size={24} />
                     </button>
                     <Link to="/profile" className="w-10 h-10 rounded-full overflow-hidden border-2 border-yellow-400">
