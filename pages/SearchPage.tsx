@@ -9,19 +9,32 @@ const SectionHeader: React.FC<{ title: string }> = ({ title }) => (
   <h2 className="text-2xl font-bold text-gray-100 mb-4">{title}</h2>
 );
 
-const ClipsCard: React.FC = () => {
+const ClipsCarousel: React.FC = () => {
+    const clips = [
+        { id: 1, title: "He Restores My Soul", image: "https://images.pexels.com/photos/1570807/pexels-photo-1570807.jpeg?auto=compress&cs=tinysrgb&w=800" },
+        { id: 2, title: "Walk By Faith", image: "https://images.pexels.com/photos/355863/pexels-photo-355863.jpeg?auto=compress&cs=tinysrgb&w=800" },
+        { id: 3, title: "Love Never Fails", image: "https://images.pexels.com/photos/380768/pexels-photo-380768.jpeg?auto=compress&cs=tinysrgb&w=800" }
+    ];
+
     return (
         <div className="mb-8">
-            <Link to="/clips" className="relative block rounded-lg overflow-hidden h-32 group shadow-lg">
-                 <img src="https://images.pexels.com/photos/1631677/pexels-photo-1631677.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Abstract colorful background" className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
-                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                    <div className="text-center text-white">
-                        <Film size={32} className="mx-auto mb-2"/>
-                        <h3 className="text-xl font-bold">Clips</h3>
-                        <p className="text-sm">Inspirational verse clips</p>
-                    </div>
-                 </div>
-            </Link>
+            <div className="flex justify-between items-center mb-4">
+                 <h2 className="text-2xl font-bold text-gray-100">Clips</h2>
+                 <Link to="/clips" className="text-yellow-400 font-semibold text-sm flex items-center">
+                     See All <ChevronRight size={16} />
+                 </Link>
+            </div>
+            <div className="flex space-x-4 overflow-x-auto pb-2 -mx-4 px-4">
+                {clips.map(clip => (
+                    <Link to="/clips" key={clip.id} className="flex-shrink-0 w-32 h-56 block rounded-xl overflow-hidden relative group shadow-lg transition-transform duration-200 hover:scale-105">
+                        <img src={clip.image} alt={clip.title} className="absolute inset-0 w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                        <div className="absolute bottom-0 left-0 p-2 text-white">
+                            <h4 className="font-bold text-sm leading-tight" style={{textShadow: '1px 1px 2px #000'}}>{clip.title}</h4>
+                        </div>
+                    </Link>
+                ))}
+            </div>
         </div>
     );
 };
@@ -135,7 +148,7 @@ const ExplorePage: React.FC = () => {
       <div className="mb-8">
           <VerseOfTheDay />
       </div>
-      <ClipsCard />
+      <ClipsCarousel />
       <DailyQuizCard />
       <PopularPlans />
       <StudyByTopic />
