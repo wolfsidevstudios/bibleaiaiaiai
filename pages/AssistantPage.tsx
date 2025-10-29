@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Send, Sparkles, User } from 'lucide-react';
+import { Send, Sparkles, User, Radio } from 'lucide-react';
 import { ChatMessage as ChatMessageType } from '../types';
 import { generateAiResponse } from '../services/geminiService';
 import ChatMessage from '../components/ChatMessage';
@@ -107,7 +107,10 @@ const AssistantPage: React.FC = () => {
             className="w-full bg-gray-800 text-white p-3 rounded-full border-2 border-gray-700 focus:border-yellow-500 focus:outline-none"
             disabled={isLoading}
           />
-          <button type="submit" disabled={isLoading} className="bg-yellow-500 text-black p-3 rounded-full hover:bg-yellow-400 disabled:bg-gray-600">
+          <Link to="/live-ai" className="bg-gray-800 text-white p-3 rounded-full hover:bg-gray-700 transition-colors flex-shrink-0">
+            <Radio size={24} />
+          </Link>
+          <button type="submit" disabled={isLoading} className="bg-yellow-500 text-black p-3 rounded-full hover:bg-yellow-400 disabled:bg-gray-600 flex-shrink-0">
             <Send size={24} />
           </button>
         </form>

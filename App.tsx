@@ -11,6 +11,7 @@ import ClipsPage from './pages/ClipsPage';
 import QuizPage from './pages/QuizPage';
 import WelcomePage from './pages/WelcomePage';
 import AuthPage from './pages/AuthPage';
+import LiveAiPage from './pages/LiveAiPage';
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
 
 const ProtectedRoutes: React.FC = () => {
@@ -48,6 +49,7 @@ const AppRoutes: React.FC = () => {
     <Routes>
       <Route path="/welcome" element={auth?.user ? <Navigate to="/" /> : <WelcomePage />} />
       <Route path="/auth" element={auth?.user ? <Navigate to="/" /> : <AuthPage />} />
+      <Route path="/live-ai" element={auth?.user ? <LiveAiPage /> : <Navigate to="/welcome" replace />} />
       <Route path="/*" element={<ProtectedRoutes />} />
     </Routes>
   )
