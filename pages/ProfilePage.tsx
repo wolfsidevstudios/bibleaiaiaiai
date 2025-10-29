@@ -1,17 +1,18 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Bookmark, LogOut, ArrowLeft, Clapperboard, ClipboardList, Trophy } from 'lucide-react';
-import { getBookmarks, getClipBookmarks, getSavedPlans } from '../services/storageService';
-import { fetchVerse } from '../services/bibleService';
-import { BibleApiResponse, Clip, Plan, Goal } from '../types';
+import { Bookmark, LogOut, ArrowLeft, Clapperboard, ClipboardList, Trophy, Video } from 'lucide-react';
+import { getClipBookmarks, getSavedPlans } from '../services/storageService';
+import { Clip, Plan, Goal, SupabaseClip } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { plans as staticPlans } from '../data/plans';
 import { AuthContext } from '../contexts/AuthContext';
 import { OnboardingContext } from '../contexts/OnboardingContext';
+import { supabase } from '../services/supabaseClient';
 
 const ProfilePage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'verses' | 'clips' | 'plans' | 'goals'>('verses');
-  const [bookmarkedVerses, setBookmarkedVerses] = useState<BibleApiResponse[]>([]);
+  const [activeTab, setActiveTab] = useState<'my-clips' | 'clips' | 'plans' | 'goals'>('my-clips');
+  const [myClips, setMyClips] = useState<SupabaseClip[]>([]);
+  const [myClipsCount, setMyClipsCount] = useState(0);
   const [bookmarkedClips, setBookmarkedClips] = useState<Clip[]>([]);
   const [savedPlans, setSavedPlans] = useState<Plan[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -22,13 +23,30 @@ const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const fetchMyClipsCount = async () => {
+        if (!auth?.user?.id) return;
+        const { count, error } = await supabase
+            .from('clips')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', auth.user.id);
+        if (error) console.error("Error fetching my clips count:", error);
+        else setMyClipsCount(count || 0);
+    };
+    fetchMyClipsCount();
+  }, [auth?.user?.id]);
+
+  useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      if (activeTab === 'verses') {
-        const bookmarkRefs = getBookmarks();
-        const versePromises = bookmarkRefs.map(ref => fetchVerse(ref));
-        const verses = await Promise.all(versePromises);
-        setBookmarkedVerses(verses.filter((v): v is BibleApiResponse => v !== null));
+      if (activeTab === 'my-clips') {
+          if (!auth?.user?.id) { setLoading(false); return; }
+          const { data, error } = await supabase
+              .from('clips')
+              .select('*')
+              .eq('user_id', auth.user.id)
+              .order('created_at', { ascending: false });
+          if (error) console.error("Error fetching my clips", error);
+          else if (data) setMyClips(data);
       } else if (activeTab === 'clips') {
         setBookmarkedClips(getClipBookmarks());
       } else if (activeTab === 'plans') {
@@ -41,14 +59,13 @@ const ProfilePage: React.FC = () => {
       setLoading(false);
     };
     loadData();
-  }, [activeTab, onboarding?.onboardingData?.goals]);
+  }, [activeTab, auth?.user?.id, onboarding?.onboardingData?.goals]);
   
   const handleLogout = () => {
     auth?.logout();
     navigate('/welcome');
   };
 
-  const verseCount = getBookmarks().length;
   const clipCount = getClipBookmarks().length;
   const planCount = getSavedPlans().length;
   const goalCount = onboarding?.onboardingData?.goals?.length || 0;
@@ -72,12 +89,16 @@ const ProfilePage: React.FC = () => {
 
           <div className="flex items-center justify-around flex-grow">
             <div className="text-center">
+              <p className="text-2xl font-bold">{myClipsCount}</p>
+              <p className="text-sm text-gray-400">My Clips</p>
+            </div>
+             <div className="text-center">
               <p className="text-2xl font-bold">{goalCount}</p>
               <p className="text-sm text-gray-400">Goals</p>
             </div>
              <div className="text-center">
               <p className="text-2xl font-bold">{clipCount}</p>
-              <p className="text-sm text-gray-400">Clips</p>
+              <p className="text-sm text-gray-400">Saved</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold">{planCount}</p>
@@ -92,6 +113,12 @@ const ProfilePage: React.FC = () => {
       {/* Tabs */}
       <div className="border-t border-b border-gray-800 flex justify-around">
         <button 
+            onClick={() => setActiveTab('my-clips')}
+            className={`flex-1 flex items-center justify-center space-x-2 p-4 font-semibold transition-colors ${activeTab === 'my-clips' ? 'text-yellow-400 border-t-2 border-yellow-400' : 'text-gray-400'}`}>
+          <Clapperboard size={18} />
+          <span>MY CLIPS</span>
+        </button>
+        <button 
             onClick={() => setActiveTab('goals')}
             className={`flex-1 flex items-center justify-center space-x-2 p-4 font-semibold transition-colors ${activeTab === 'goals' ? 'text-yellow-400 border-t-2 border-yellow-400' : 'text-gray-400'}`}>
           <Trophy size={18} />
@@ -100,8 +127,8 @@ const ProfilePage: React.FC = () => {
         <button 
             onClick={() => setActiveTab('clips')}
             className={`flex-1 flex items-center justify-center space-x-2 p-4 font-semibold transition-colors ${activeTab === 'clips' ? 'text-yellow-400 border-t-2 border-yellow-400' : 'text-gray-400'}`}>
-          <Clapperboard size={18} />
-          <span>CLIPS</span>
+          <Bookmark size={18} />
+          <span>SAVED</span>
         </button>
         <button 
             onClick={() => setActiveTab('plans')}
@@ -119,6 +146,23 @@ const ProfilePage: React.FC = () => {
             </div>
         ) : (
             <>
+                {activeTab === 'my-clips' && (
+                    myClips.length > 0 ? (
+                        <div className="grid grid-cols-3 gap-1">
+                            {myClips.map(clip => (
+                                <div key={clip.id} className="relative aspect-square bg-gray-800 overflow-hidden group">
+                                    <img src={clip.image_url} alt={clip.title || ''} className="w-full h-full object-cover"/>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-16">
+                            <Video size={48} className="mx-auto text-gray-600 mb-4" />
+                            <h3 className="text-xl font-bold">No Clips Created</h3>
+                            <p className="text-gray-400">Create your first clip to see it here.</p>
+                        </div>
+                    )
+                )}
                 {activeTab === 'goals' && (
                     goals.length > 0 ? (
                         <div className="space-y-3 p-4">
@@ -155,8 +199,8 @@ const ProfilePage: React.FC = () => {
                       </div>
                     ) : (
                         <div className="text-center py-16">
-                            <Clapperboard size={48} className="mx-auto text-gray-600 mb-4" />
-                            <h3 className="text-xl font-bold">No Saved Clips</h3>
+                            <Bookmark size={48} className="mx-auto text-gray-600 mb-4" />
+                            <h3 className="text-xl font-bold">No Saved Items</h3>
                             <p className="text-gray-400">Bookmark a clip from the feed to see it here.</p>
                         </div>
                     )

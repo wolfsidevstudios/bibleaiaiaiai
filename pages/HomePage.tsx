@@ -1,37 +1,15 @@
 import React, { useState, useEffect, useCallback, useContext, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { User, Flame } from 'lucide-react';
-import { PexelsPhoto, StreakData, Clip } from '../types';
+import { User, Heart } from 'lucide-react';
+import { PexelsPhoto, Clip } from '../types';
 import { fetchPhotos } from '../services/pexelsService';
-import { getBookmarks, addBookmark, removeBookmark, getLastRead, getDailyPrayer, saveDailyPrayer, updateStreak } from '../services/storageService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { AuthContext } from '../contexts/AuthContext';
 import { OnboardingContext } from '../contexts/OnboardingContext';
 import ClipCard from '../components/ClipCard';
 import DailyBrief from '../components/DailyBrief';
 import { getVersesForTopics } from '../data/topicVerses';
-
-const DailyStreak: React.FC = () => {
-    const [streakData, setStreakData] = useState<StreakData | null>(null);
-
-    useEffect(() => {
-        setStreakData(updateStreak());
-    }, []);
-
-    if (!streakData || streakData.count < 1) return null;
-
-    return (
-        <div className="mb-6 bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-xl flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-yellow-400 flex items-center justify-center">
-                <Flame size={28} className="text-white" />
-            </div>
-            <div>
-                <p className="text-xl font-bold">{streakData.count} Day Streak</p>
-                <p className="text-sm text-gray-400">You're on a roll! Keep it up.</p>
-            </div>
-        </div>
-    );
-};
+import DonateModal from '../components/DonateModal';
 
 const HomePage: React.FC = () => {
   const auth = useContext(AuthContext);
@@ -39,6 +17,7 @@ const HomePage: React.FC = () => {
   const [clips, setClips] = useState<Clip[]>([]);
   const [loading, setLoading] = useState(true);
   const [showBrief, setShowBrief] = useState(false);
+  const [showDonateModal, setShowDonateModal] = useState(false);
 
   useEffect(() => {
     const today = new Date().toISOString().slice(0, 10);
@@ -100,20 +79,26 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="h-screen w-full bg-black">
+        {showDonateModal && <DonateModal onClose={() => setShowDonateModal(false)} />}
         <header className="absolute top-0 left-0 right-0 z-20 p-4 flex justify-between items-center bg-gradient-to-b from-black/50 to-transparent">
             <div>
                 <h1 className="text-2xl font-bold text-gray-100">{getGreeting()},</h1>
                 <p className="text-gray-400">{onboarding?.onboardingData?.userName || 'Friend'}</p>
             </div>
-            <Link to="/profile" className="w-10 h-10 rounded-full overflow-hidden border-2 border-yellow-400">
-                {auth?.user?.picture ? (
-                    <img src={auth.user.picture} alt="Profile" className="w-full h-full object-cover" />
-                ) : (
-                    <div className="w-full h-full bg-gray-700 flex items-center justify-center">
-                        <User className="w-6 h-6 text-gray-400" />
-                    </div>
-                )}
-            </Link>
+            <div className="flex items-center space-x-4">
+                <button onClick={() => setShowDonateModal(true)} className="text-white hover:text-red-400 transition-colors">
+                    <Heart size={24} />
+                </button>
+                <Link to="/profile" className="w-10 h-10 rounded-full overflow-hidden border-2 border-yellow-400">
+                    {auth?.user?.picture ? (
+                        <img src={auth.user.picture} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                        <div className="w-full h-full bg-gray-700 flex items-center justify-center">
+                            <User className="w-6 h-6 text-gray-400" />
+                        </div>
+                    )}
+                </Link>
+            </div>
         </header>
 
         {loading ? (

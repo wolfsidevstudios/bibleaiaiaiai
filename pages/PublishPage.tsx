@@ -123,7 +123,7 @@ const PublishPage: React.FC = () => {
             <footer className="p-4 border-t border-gray-800">
                 <div className="flex items-center gap-4">
                     <button 
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate('/')}
                         disabled={isLoading}
                         className="w-full bg-gray-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-600 disabled:opacity-50"
                     >
