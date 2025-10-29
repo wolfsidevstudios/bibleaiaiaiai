@@ -5,7 +5,7 @@ import { AuthContext } from '../contexts/AuthContext';
 import { ArrowLeft, MapPin, Sparkle, Tag } from 'lucide-react';
 import LoadingSpinner from '../components/LoadingSpinner';
 
-const IMAGE_HOST_API_KEY = '6d207e02198a847aa98d0a2a901485a5';
+const IMAGE_HOST_API_KEY = '309a8874be3e44b98aa71f2a63d406eb';
 
 async function uploadImage(imageDataUrl: string): Promise<string | null> {
     try {
@@ -13,10 +13,9 @@ async function uploadImage(imageDataUrl: string): Promise<string | null> {
         const blob = await response.blob();
         
         const formData = new FormData();
-        formData.append('source', blob);
-        formData.append('key', IMAGE_HOST_API_KEY);
+        formData.append('image', blob);
 
-        const uploadResponse = await fetch('https://freeimage.host/api/1/upload', {
+        const uploadResponse = await fetch(`https://api.imgbb.com/1/upload?key=${IMAGE_HOST_API_KEY}`, {
             method: 'POST',
             body: formData,
         });
@@ -27,7 +26,13 @@ async function uploadImage(imageDataUrl: string): Promise<string | null> {
         }
 
         const result = await uploadResponse.json();
-        return result.image.url;
+        
+        if (result.success && result.data && result.data.url) {
+            return result.data.url;
+        } else {
+            console.error('Image upload failed. API response:', result);
+            return null;
+        }
     } catch (error) {
         console.error('Error uploading image:', error);
         return null;
