@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Bookmark, Settings, ArrowLeft, Clapperboard, ClipboardList } from 'lucide-react';
+import React, { useState, useEffect, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Bookmark, LogOut, ArrowLeft, Clapperboard, ClipboardList } from 'lucide-react';
 import { getBookmarks, getClipBookmarks, getSavedPlans } from '../services/storageService';
 import { fetchVerse } from '../services/bibleService';
 import { BibleApiResponse, Clip, Plan } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { plans as staticPlans } from '../data/plans';
+import { AuthContext } from '../contexts/AuthContext';
 
 const ProfilePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'verses' | 'clips' | 'plans'>('verses');
@@ -13,6 +14,9 @@ const ProfilePage: React.FC = () => {
   const [bookmarkedClips, setBookmarkedClips] = useState<Clip[]>([]);
   const [savedPlans, setSavedPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  const auth = useContext(AuthContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadData = async () => {
@@ -34,6 +38,11 @@ const ProfilePage: React.FC = () => {
     };
     loadData();
   }, [activeTab]);
+  
+  const handleLogout = () => {
+    auth?.logout();
+    navigate('/welcome');
+  };
 
   const verseCount = getBookmarks().length;
   const clipCount = getClipBookmarks().length;
@@ -46,17 +55,16 @@ const ProfilePage: React.FC = () => {
           <ArrowLeft size={24} />
         </Link>
         <h1 className="text-xl font-bold">Profile</h1>
-        <button className="text-gray-400 hover:text-white">
-          <Settings size={24} />
+        <button onClick={handleLogout} className="text-gray-400 hover:text-white">
+          <LogOut size={24} />
         </button>
       </header>
 
       <div className="p-4">
         {/* Profile Header */}
         <div className="flex items-center space-x-4 mb-6">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-yellow-400 to-amber-600 flex items-center justify-center">
-            <span className="text-4xl font-bold text-black">L</span>
-          </div>
+          <img src={auth?.user?.picture} alt={auth?.user?.name} className="w-20 h-20 rounded-full" />
+
           <div className="flex items-center justify-around flex-grow">
             <div className="text-center">
               <p className="text-2xl font-bold">{verseCount}</p>
@@ -72,7 +80,7 @@ const ProfilePage: React.FC = () => {
             </div>
           </div>
         </div>
-        <p className="font-bold">Lexi Follower</p>
+        <p className="font-bold">{auth?.user?.name}</p>
         <p className="text-sm text-gray-400">Exploring scripture with the help of Lexi.</p>
       </div>
       

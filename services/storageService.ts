@@ -1,9 +1,25 @@
-import { Clip, Plan } from '../types';
+import { Clip, Plan, UserProfile } from '../types';
 
 const BOOKMARKS_KEY = 'mybible_bookmarks';
 const CLIPS_BOOKMARKS_KEY = 'mybible_clip_bookmarks';
 const PLANS_KEY = 'mybible_saved_plans';
 const PLAN_PROGRESS_KEY = 'mybible_plan_progress';
+const USER_PROFILE_KEY = 'mybible_user_profile';
+
+
+// User Profile
+export const getUserProfile = (): UserProfile | null => {
+  const profileJson = localStorage.getItem(USER_PROFILE_KEY);
+  return profileJson ? JSON.parse(profileJson) : null;
+};
+
+export const saveUserProfile = (profile: UserProfile): void => {
+  localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profile));
+};
+
+export const removeUserProfile = (): void => {
+  localStorage.removeItem(USER_PROFILE_KEY);
+};
 
 
 // Verse Bookmarks

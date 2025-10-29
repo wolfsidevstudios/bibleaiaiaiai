@@ -95,3 +95,9 @@ export interface Quiz {
   image: string;
   questions: QuizQuestion[];
 }
+
+export interface UserProfile {
+  name: string;
+  email: string;
+  picture: string;
+}
