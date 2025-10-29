@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Minus, Plus, X } from 'lucide-react';
+import { Minus, Plus, X, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const DonatePage: React.FC = () => {
@@ -104,8 +104,12 @@ const DonatePage: React.FC = () => {
 
   return (
     <div className={`${commonWrapperClasses} items-center justify-between overflow-hidden`}>
-        <header className="w-full flex justify-center">
+        <header className="w-full flex justify-between items-center">
+            <button onClick={() => navigate('/')} className="p-2 -m-2 text-[#333]">
+                <ArrowLeft size={24} />
+            </button>
             <h1 className="text-2xl font-bold">GiveDirectly</h1>
+            <div className="w-10"></div> {/* Spacer to keep title centered */}
         </header>
 
         <main className="flex flex-col items-center justify-center flex-grow relative w-full -mt-16">
